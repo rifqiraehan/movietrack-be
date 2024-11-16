@@ -13,19 +13,25 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    protected $table = 'users';
+    protected $primaryKey = 'id';
+    protected $keyType = 'int';
+    public $incrementing = true;
+    public $timestamps = true;
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
 
-    /* protected $fillable = [
-        'name',
+    protected $fillable = [
+        'username',
         'email',
         'password',
-    ]; */
+    ];
 
-    protected $guarded = [];
+    // protected $guarded = [];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -58,5 +64,35 @@ class User extends Authenticatable
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function getAuthIdentifierName(): string
+    {
+        return 'username';
+    }
+
+    public function getAuthIdentifier(): string
+    {
+        return $this->username;
+    }
+
+    public function getAuthPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function getRememberToken(): string
+    {
+        return $this->token;
+    }
+
+    public function setRememberToken($value): void
+    {
+        $this->token = $value;
+    }
+
+    public function getRememberTokenName(): string
+    {
+        return 'token';
     }
 }

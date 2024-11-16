@@ -1,19 +1,254 @@
 {
-  "openapi":"3.0.3",
+  "openapi": "3.0.3",
   "info": {
-    "title":"User API",
-    "description": "User API",
-    "version":"1.0"
+    "title": "User API",
+    "version": "1.0.0",
+    "description": "API for managing user accounts including registration, login, profile management, and logout."
   },
-  "servers": [
-    {"url":"https://localhost:8000"}
-  ],
   "paths": {
-    "/api/users" :{
+    "/users/register": {
       "post": {
-        "description": "Register new user."
+        "summary": "Register a new user",
+        "description": "Creates a new user account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegistration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "success": {
+                    "summary": "A successful response",
+                    "value": { "message": "User registered successfully." }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input data",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "error": {
+                    "summary": "An error response",
+                    "value": { "error": "Invalid email format or missing required fields." }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
-    ""
+    "/users/login": {
+      "post": {
+        "summary": "Login a user",
+        "description": "Authenticates a user and returns a session token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLogin"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User logged in successfully",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "success": {
+                    "summary": "A successful response",
+                    "value": {
+                      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "error": {
+                    "summary": "An error response",
+                    "value": { "error": "Invalid username or password." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/logout": {
+      "post": {
+        "summary": "Logout a user",
+        "description": "Logs out the currently authenticated user.",
+        "responses": {
+          "200": {
+            "description": "User logged out successfully",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "success": {
+                    "summary": "A successful response",
+                    "value": { "message": "User logged out successfully." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "summary": "Get current user profile",
+        "description": "Fetches the profile of the currently authenticated user.",
+        "responses": {
+          "200": {
+            "description": "Profile details of the current user",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserProfile" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - No valid session",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "error": {
+                    "summary": "An error response",
+                    "value": { "error": "User is not authenticated." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update current user profile",
+        "description": "Updates the profile information of the currently authenticated user.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserProfileUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User profile updated successfully",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "success": {
+                    "summary": "A successful response",
+                    "value": { "message": "User profile updated successfully." }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input data",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "error": {
+                    "summary": "An error response",
+                    "value": { "error": "Invalid field values provided." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserRegistration": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Unique username for the user.",
+            "example": "john_doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email address.",
+            "example": "john@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password for the user account.",
+            "example": "P@ssw0rd"
+          }
+        },
+        "required": ["username", "email", "password"]
+      },
+      "UserLogin": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Username of the user.",
+            "example": "john_doe"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password for the user account.",
+            "example": "P@ssw0rd"
+          }
+        },
+        "required": ["username", "password"]
+      },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string", "description": "User's username", "example": "john_doe" },
+          "email": { "type": "string", "description": "User's email", "example": "john@example.com" },
+          "is_admin": { "type": "boolean", "description": "Indicates if the user has admin rights", "example": false }
+        }
+      },
+      "UserProfileUpdate": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "New username for the user.",
+            "example": "john_doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "New email address for the user.",
+            "example": "john_new@example.com"
+          }
+        }
+      }
+    }
   }
 }
