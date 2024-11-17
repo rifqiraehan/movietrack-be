@@ -26,7 +26,8 @@ class UserUpdateRequest extends FormRequest
         return [
             'username' => ['nullable', 'max:255'],
             'email' => ['nullable', 'max:255'],
-            'password' => ['nullable', 'max:255']
+            'password' => ['nullable', 'max:255'],
+            'pfp' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
         ];
     }
 

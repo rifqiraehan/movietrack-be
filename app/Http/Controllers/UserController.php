@@ -20,7 +20,7 @@ class UserController extends Controller
     {
         $data = $request->validated();
 
-        if(User::where('username', $data['username'])->count() == 1) {
+        if (User::where('username', $data['username'])->count() == 1) {
             throw new HttpResponseException(response([
                 'errors' => [
                     'username' => [
@@ -30,7 +30,7 @@ class UserController extends Controller
             ], 400));
         }
 
-        if(User::where('email', $data['email'])->count() == 1) {
+        if (User::where('email', $data['email'])->count() == 1) {
             throw new HttpResponseException(response([
                 'errors' => [
                     'email' => [
@@ -44,7 +44,7 @@ class UserController extends Controller
         $user->password = Hash::make($data['password']);
         $user->save();
 
-        return( new UserResource($user))->response()->setStatusCode(201);
+        return (new UserResource($user))->response()->setStatusCode(201);
     }
 
     public function login(UserLoginRequest $request): JsonResponse
@@ -53,7 +53,7 @@ class UserController extends Controller
 
         $user = User::where('username', $data['username'])->first();
 
-        if(!$user || !Hash::check($data['password'], $user->password)) {
+        if (!$user || !Hash::check($data['password'], $user->password)) {
             throw new HttpResponseException(response([
                 'errors' => [
                     'message' => [
@@ -82,8 +82,8 @@ class UserController extends Controller
 
         $user = Auth::user();
 
-        if(isset($data['username']) && $data['username'] != $user->username) {
-            if(User::where('username', $data['username'])->count() == 1) {
+        if (isset($data['username']) && $data['username'] != $user->username) {
+            if (User::where('username', $data['username'])->count() == 1) {
                 throw new HttpResponseException(response([
                     'errors' => [
                         'username' => [
@@ -94,8 +94,8 @@ class UserController extends Controller
             }
         }
 
-        if(isset($data['email']) && $data['email'] != $user->email) {
-            if(User::where('email', $data['email'])->count() == 1) {
+        if (isset($data['email']) && $data['email'] != $user->email) {
+            if (User::where('email', $data['email'])->count() == 1) {
                 throw new HttpResponseException(response([
                     'errors' => [
                         'email' => [
@@ -106,8 +106,20 @@ class UserController extends Controller
             }
         }
 
-        if(isset($data['password'])) {
+        if (isset($data['password'])) {
             $data['password'] = Hash::make($data['password']);
+        }
+
+        if ($request->hasFile('pfp')) {
+            $file = $request->file('pfp');
+            $extension = $file->getClientOriginalExtension();
+            $filename = Str::uuid()->toString() . '.' . $extension;
+            $file->storeAs('public/pfps', $filename);
+            $data['pfp'] = $filename;
+
+            if ($user->pfp) {
+                \Storage::delete('public/pfps/' . $user->pfp);
+            }
         }
 
         $user->update($data);

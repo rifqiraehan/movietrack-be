@@ -242,6 +242,76 @@ class UserTest extends TestCase
             ]);
     }
 
+    // testUpdatePfpSuccess
+    public function testUpdatePfpSuccess() {
+        $this->seed([UserSeeder::class]);
+        $oldUser = User::where('username', 'Chieru16')->first();
+
+        // Delete old pfp if not null
+        if ($oldUser->pfp) {
+            \Storage::delete('public/pfps/' . $oldUser->pfp);
+        }
+
+        $this->patch('/api/users',
+        [
+            'pfp' => new \Illuminate\Http\UploadedFile(
+                public_path('images\default.jpeg'),
+                'default.jpeg',
+                'image/jpeg',
+                null,
+                true
+            )
+        ],
+        [
+            'Authorization' => 'test'
+        ])->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'pfp' => asset('storage/pfps/' . User::where('username', 'Chieru16')->first()->pfp)
+                ]
+            ]);
+    }
+
+    public function testUpdatePfpTypeFailed() {
+        $this->seed([UserSeeder::class]);
+
+        $this->patch('/api/users',
+        [
+            'pfp' => 'a'.str_repeat('a', 255)
+        ],
+        [
+            'Authorization' => 'test'
+        ])->assertStatus(400)
+            ->assertJson([
+                'errors' => [
+                    'pfp' => ["The pfp field must be an image."]
+                ]
+            ]);
+    }
+
+    public function testUpdatePfpSizeFailed() {
+        $this->seed([UserSeeder::class]);
+
+        $this->patch('/api/users',
+        [
+            'pfp' => new \Illuminate\Http\UploadedFile(
+                public_path('images/bigSize.jpg'),
+                'bigSize.jpg',
+                'image/jpg',
+                null,
+                true
+            )
+        ],
+        [
+            'Authorization' => 'test'
+        ])->assertStatus(400)
+            ->assertJson([
+                'errors' => [
+                    'pfp' => ["The pfp field must not be greater than 2048 kilobytes."]
+                ]
+            ]);
+    }
+
     public function testUpdateEmailFailed() {
         $this->seed([UserSeeder::class]);
 

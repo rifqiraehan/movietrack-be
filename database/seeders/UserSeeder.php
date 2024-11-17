@@ -18,14 +18,16 @@ class UserSeeder extends Seeder
             'email' => 'rifqiraehan86@gmail.com',
             'password' => Hash::make('rahasia'),
             'is_admin' => 1,
-            'token' => 'test'
+            'token' => 'test',
+            'pfp' => null
         ]);
 
         User::create([
             'username' => 'AkebiKomichi',
             'email' => 'akebikomichi@gmail.com',
             'password' => Hash::make('rahasia'),
-            'token' => 'tests'
+            'token' => 'tests',
+            'pfp' => null
         ]);
     }
 }
