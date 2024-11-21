@@ -19,7 +19,8 @@ class UserResource extends JsonResource
             'username' => $this->username,
             'email' => $this->email,
             'token' => $this->whenNotNull($this->token),
-            'pfp' => $this->whenNotNull($this->pfp ? asset('storage/pfps/' . $this->pfp) : null),
+            'is_admin' => $this->is_admin,
+            'pfp' => $this->pfp,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

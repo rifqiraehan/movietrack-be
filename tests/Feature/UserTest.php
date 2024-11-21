@@ -267,7 +267,7 @@ class UserTest extends TestCase
         ])->assertStatus(200)
             ->assertJson([
                 'data' => [
-                    'pfp' => asset('storage/pfps/' . User::where('username', 'Chieru16')->first()->pfp)
+                    'pfp' => asset(User::where('username', 'Chieru16')->first()->pfp)
                 ]
             ]);
     }

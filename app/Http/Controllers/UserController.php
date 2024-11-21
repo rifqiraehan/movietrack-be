@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -114,11 +115,12 @@ class UserController extends Controller
             $file = $request->file('pfp');
             $extension = $file->getClientOriginalExtension();
             $filename = Str::uuid()->toString() . '.' . $extension;
-            $file->storeAs('public/pfps', $filename);
+            $file->storeAs('pfps', $filename);
             $data['pfp'] = $filename;
 
             if ($user->pfp) {
-                \Storage::delete('public/pfps/' . $user->pfp);
+                Storage::delete('pfps/' . basename($user->pfp));
+
             }
         }
 

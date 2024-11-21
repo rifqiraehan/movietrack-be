@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -25,7 +26,6 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-
     protected $fillable = [
         'username',
         'email',
@@ -33,7 +33,7 @@ class User extends Authenticatable
         'pfp'
     ];
 
-    // protected $guarded = [];
+    protected $guarded = ['is_admin'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -96,5 +96,17 @@ class User extends Authenticatable
     public function getRememberTokenName(): string
     {
         return 'token';
+    }
+
+    /**
+     * pfp
+     *
+     * @return Attribute
+     */
+    protected function pfp(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($pfp) => url('/storage/pfps/' . $pfp),
+        );
     }
 }

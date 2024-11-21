@@ -29,5 +29,13 @@ class UserSeeder extends Seeder
             'token' => 'tests',
             'pfp' => null
         ]);
+
+        User::create([
+            'username' => 'raehan',
+            'email' => 'raehan@gmail.com',
+            'password' => Hash::make('secret'),
+            'token' => 'ujicoba',
+            'pfp' => null
+        ]);
     }
 }
