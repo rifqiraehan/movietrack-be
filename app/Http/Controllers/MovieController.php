@@ -2,64 +2,91 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Movie\MovieSearchRequest;
+use App\Http\Resources\Movie\MovieResource;
 use App\Models\Movie;
 use Illuminate\Http\Request;
+use GuzzleHttp\Client;
 
-class MovieController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+class MovieController extends Controller {
+    public function searchMovies(MovieSearchRequest $request)
     {
-        //
+        $query = $request->input('query');
+
+        // Fetch movies from the database
+        $dbMovies = Movie::where('title', 'like', "%{$query}%")->get(['id', 'title', 'poster_path', 'release_date']);
+
+        // Fetch movies from TMDB API
+        $client = new Client();
+        $response = $client->get('https://api.themoviedb.org/3/search/movie', [
+            'query' => [
+                'query' => $query,
+                'language' => 'id-ID',
+                'api_key' => env('TMDB_API_KEY'),
+            ],
+        ]);
+
+        $tmdbMovies = json_decode($response->getBody()->getContents(), true)['results'];
+
+        // Filter and format TMDB movies
+        $tmdbMovies = array_map(function ($movie) {
+            return [
+                'id' => $movie['id'],
+                'title' => $movie['title'],
+                'poster_path' => $movie['poster_path'],
+                'release_date' => $movie['release_date'],
+            ];
+        }, $tmdbMovies);
+
+        // Combine DB movies and TMDB movies
+        $movies = $dbMovies->toArray();
+        $movies = array_merge($movies, $tmdbMovies);
+
+        return response()->json(new MovieResource(true, 'Movies fetched successfully', $movies));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function getMovie($id)
     {
-        //
-    }
+        // Fetch movie from the database
+        $dbMovie = Movie::find($id);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        if ($dbMovie) {
+            return response()->json(new MovieResource(true, 'Movie fetched in DB successfully', $dbMovie));
+        }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Movie $movie)
-    {
-        //
-    }
+        // Fetch movie from TMDB API
+        $client = new Client();
+        $response = $client->get("https://api.themoviedb.org/3/movie/{$id}", [
+            'query' => [
+                'language' => 'id-ID',
+                'api_key' => env('TMDB_API_KEY'),
+            ],
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Movie $movie)
-    {
-        //
-    }
+        $tmdbMovie = json_decode($response->getBody()->getContents(), true);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Movie $movie)
-    {
-        //
-    }
+        // Safely access the first production company name
+        $firstProductionCompanyName = isset($tmdbMovie['production_companies'][0])
+            ? $tmdbMovie['production_companies'][0]['name']
+            : null;
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Movie $movie)
-    {
-        //
+        // Filter and format TMDB movie
+        $tmdbMovie = [
+            'id' => $tmdbMovie['id'],
+            'title' => $tmdbMovie['title'],
+            'poster_path' => $tmdbMovie['poster_path'],
+            'release_date' => $tmdbMovie['release_date'],
+            'genres' => array_map(function ($genre) {
+                return $genre['name'];
+            }, $tmdbMovie['genres']),
+            'overview' => $tmdbMovie['overview'],
+            'production_companies' => [
+                'name' => $firstProductionCompanyName
+            ],
+            'runtime' => $tmdbMovie['runtime'],
+            'status' => $tmdbMovie['status'],
+        ];
+
+        return response()->json(new MovieResource(true, 'Movie fetched in TDMB API successfully', $tmdbMovie));
     }
 }
