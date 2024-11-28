@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('rahasia'),
             'is_admin' => 1,
             'token' => 'test',
-            'pfp' => 'images/akari.jpeg'
+            'pfp' => 'akari.jpeg'
         ]);
 
         User::create([
@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
             'email' => 'akebikomichi@gmail.com',
             'password' => Hash::make('rahasia'),
             'token' => 'tests',
-            'pfp' => 'images/akebi.jpeg'
+            'pfp' => 'akebi.jpeg'
         ]);
 
         User::create([
@@ -35,7 +35,7 @@ class UserSeeder extends Seeder
             'email' => 'raehan@gmail.com',
             'password' => Hash::make('secret'),
             'token' => 'ujicoba',
-            'pfp' => 'images/default.jpeg'
+            'pfp' => 'default.jpeg'
         ]);
 
         User::create([
@@ -43,7 +43,7 @@ class UserSeeder extends Seeder
             'email' => 'hondatohru@gmail.com',
             'password' => Hash::make('rahasia'),
             'token' => 'testo',
-            'pfp' => 'images/lain.jpeg'
+            'pfp' => 'lain.jpeg'
         ]);
 
         User::create([
@@ -51,7 +51,7 @@ class UserSeeder extends Seeder
             'email' => 'hime@gmail.com',
             'password' => Hash::make('secret'),
             'token' => 'cobacoba',
-            'pfp' => 'images/akari.jpeg'
+            'pfp' => 'akari.jpeg'
         ]);
     }
 }
