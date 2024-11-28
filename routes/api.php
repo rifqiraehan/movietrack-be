@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\MovieController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WatchListController;
 use App\Http\Middleware\ApiAuthMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -41,3 +43,42 @@ Route::get('/movies', [MovieController::class, 'searchMovies']);
 */
 Route::get('/movies/{id}', [MovieController::class, 'getMovie']);
 
+/*
+|--------------------------------------------------------------------------
+| Get All Reviews for a Movie
+|--------------------------------------------------------------------------
+| URL: /movies/{id}/reviews
+| Method: GET
+| Description: Fetch all reviews for a specific movie
+*/
+Route::get('/movies/{movie_id}/reviews', [MovieController::class, 'getMovieReviews']);
+
+/*
+|--------------------------------------------------------------------------
+| Get All Reviews for all Movies
+|--------------------------------------------------------------------------
+| URL: /reviews
+| Method: GET
+| Description: Fetch all reviews for all movies
+*/
+Route::get('/reviews', [ReviewController::class, 'index']);
+
+/*
+|--------------------------------------------------------------------------
+| Get All Movies in Current User’s Watchlist
+|--------------------------------------------------------------------------
+| URL: /watchlists
+| Method: GET
+| Description: Fetch all movies in the current user's watchlist
+*/
+Route::get('/watchlists', [WatchListController::class, 'index']);
+
+/*
+|--------------------------------------------------------------------------
+| Get Current User’s Watchlist by Status
+|--------------------------------------------------------------------------
+| URL: /watchlists/{status_id}
+| Method: GET
+| Description: Fetch all movies in the current user's watchlist by status
+*/
+Route::get('/watchlists/{status_id}', [WatchListController::class, 'show']);

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Movie\MovieSearchRequest;
 use App\Http\Resources\Movie\MovieResource;
+use App\Http\Resources\Review\ReviewResource;
 use App\Models\Movie;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 
@@ -89,4 +91,19 @@ class MovieController extends Controller {
 
         return response()->json(new MovieResource(true, 'Movie fetched in TDMB API successfully', $tmdbMovie));
     }
+
+    // Get all movies for specific movie based movie_id. Endpoint: GET /movies/{movie_id}/reviews
+    public function getMovieReviews($movie_id)
+{
+    $reviews = Review::where('movie_id', $movie_id)->latest()->get();
+
+    if ($reviews->isEmpty()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No reviews found for this movie',
+        ], 404);
+    }
+
+    return response()->json(new ReviewResource(true, 'All reviews for movie', $reviews));
+}
 }
