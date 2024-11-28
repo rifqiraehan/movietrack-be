@@ -5,8 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Database\Seeders\UserSeeder;
-use Database\Seeders\GenreSeeder;
+use Illuminate\Support\Facades\File;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,7 +21,13 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
+        File::deleteDirectory(public_path('storage/app/public/pfps'));
+        File::deleteDirectory(storage_path('app/public/pfps'));
+
         $this->call(UserSeeder::class);
         $this->call(GenreSeeder::class);
+        $this->call(StatusSeeder::class);
+        $this->call(ReviewSeeder::class);
+        $this->call(WatchlistSeeder::class);
     }
 }

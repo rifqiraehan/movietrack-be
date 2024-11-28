@@ -11,6 +11,8 @@ class WatchList extends Model
     use HasFactory;
 
     protected $guarded = [];
+    protected $table = 'watchlists';
+
 
     public function user(): BelongsTo
     {

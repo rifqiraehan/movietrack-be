@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('duration');
             $table->string('status');
             $table->string('release_date');
-            $table->string('overview');
+            $table->text('overview');
             $table->timestamps();
         });
     }

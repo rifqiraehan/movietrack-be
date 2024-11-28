@@ -31,7 +31,6 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
 */
 Route::get('/movies', [MovieController::class, 'searchMovies']);
 
-
 /*
 |--------------------------------------------------------------------------
 | Get Movie Details
