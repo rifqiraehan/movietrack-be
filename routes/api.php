@@ -30,7 +30,7 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
     | Description: Fetch all movies in the current user's watchlist
     */
     Route::get('/watchlists', [WatchListController::class, 'get']);
-    
+
     /*
     |--------------------------------------------------------------------------
     | Get Current User’s Watchlist by Status
@@ -82,3 +82,24 @@ Route::get('/movies/{movie_id}/reviews', [MovieController::class, 'getMovieRevie
 | Description: Fetch all reviews for all movies
 */
 Route::get('/reviews', [ReviewController::class, 'index']);
+
+
+/*
+|--------------------------------------------------------------------------
+| Get All Recommended Movies
+|--------------------------------------------------------------------------
+| URL: /movies/{type}
+| Method: GET
+| Description: Fetch all recommended movies based on the type
+*/
+Route::get('/recs/top-rated', [MovieController::class, 'getTopRatedMovies']);
+Route::get('/recs/popular', [MovieController::class, 'getPopularMovies']);
+Route::get('/recs/upcoming', [MovieController::class, 'getUpcomingMovies']);
+Route::get('/recs/now-playing', [MovieController::class, 'getNowPlayingMovies']);
+Route::get('/recs', function () {
+    return response()->json([
+        'success' => false,
+        'message' => 'You need to specify the type of recommendation.',
+    ], 400);
+});
+Route::get('/movies/{movie_id}/recommendations', [MovieController::class, 'getMovieRecommendations']);

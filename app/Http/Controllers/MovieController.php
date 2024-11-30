@@ -113,4 +113,130 @@ class MovieController extends Controller
 
         return response()->json(new ReviewResource(true, 'All reviews for movie', $reviews));
     }
+
+    /*
+    get recommendations based input movie_id the endpoint: GET https://api.themoviedb.org/3/movie/{movie_id}/recommendations
+    */
+
+    public function getMovieRecommendations($movie_id)
+    {
+        $client = new Client();
+        $response = $client->get("https://api.themoviedb.org/3/movie/{$movie_id}/recommendations", [
+            'query' => [
+                'language' => 'id-ID',
+                'api_key' => env('TMDB_API_KEY'),
+            ],
+        ]);
+
+        $movies = json_decode($response->getBody()->getContents(), true)['results'];
+
+        $movies = array_map(function ($movie) {
+            return [
+                'id' => $movie['id'],
+                'title' => $movie['title'],
+                'poster_path' => $movie['poster_path'],
+            ];
+        }, $movies);
+
+        if (empty($movies)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No recommendations found for this movie',
+            ], 404);
+        }
+
+        return response()->json(new MovieResource(true, 'Recommended movies fetched successfully', $movies));
+    }
+
+    public function getTopRatedMovies()
+    {
+        $client = new Client();
+        $response = $client->get('https://api.themoviedb.org/3/movie/top_rated', [
+            'query' => [
+                'language' => 'id-ID',
+                'api_key' => env('TMDB_API_KEY'),
+            ],
+        ]);
+
+        $movies = json_decode($response->getBody()->getContents(), true)['results'];
+
+        $movies = array_map(function ($movie) {
+            return [
+                'id' => $movie['id'],
+                'title' => $movie['title'],
+                'poster_path' => $movie['poster_path'],
+            ];
+        }, $movies);
+
+        return response()->json(new MovieResource(true, 'Top rated movies fetched successfully', $movies));
+    }
+
+    public function getPopularMovies()
+    {
+        $client = new Client();
+        $response = $client->get('https://api.themoviedb.org/3/movie/popular', [
+            'query' => [
+                'language' => 'id-ID',
+                'api_key' => env('TMDB_API_KEY'),
+            ],
+        ]);
+
+        $movies = json_decode($response->getBody()->getContents(), true)['results'];
+
+        $movies = array_map(function ($movie) {
+            return [
+                'id' => $movie['id'],
+                'title' => $movie['title'],
+                'poster_path' => $movie['poster_path'],
+            ];
+        }, $movies);
+
+        return response()->json(new MovieResource(true, 'Popular movies fetched successfully', $movies));
+    }
+
+    public function getUpcomingMovies()
+    {
+        $client = new Client();
+        $response = $client->get('https://api.themoviedb.org/3/movie/upcoming', [
+            'query' => [
+                'language' => 'id-ID',
+                'api_key' => env('TMDB_API_KEY'),
+            ],
+        ]);
+
+        $movies = json_decode($response->getBody()->getContents(), true)['results'];
+
+        $movies = array_map(function ($movie) {
+            return [
+                'id' => $movie['id'],
+                'title' => $movie['title'],
+                'poster_path' => $movie['poster_path'],
+            ];
+        }, $movies);
+
+        return response()->json(new MovieResource(true, 'Upcoming movies fetched successfully', $movies));
+    }
+
+    public function getNowPlayingMovies()
+    {
+        $client = new Client();
+        $response = $client->get('https://api.themoviedb.org/3/movie/now_playing', [
+            'query' => [
+                'language' => 'id-ID',
+                'api_key' => env('TMDB_API_KEY'),
+            ],
+        ]);
+
+        $movies = json_decode($response->getBody()->getContents(), true)['results'];
+
+        $movies = array_map(function ($movie) {
+            return [
+                'id' => $movie['id'],
+                'title' => $movie['title'],
+                'poster_path' => $movie['poster_path'],
+            ];
+        }, $movies);
+
+        return response()->json(new MovieResource(true, 'Now Playing movies fetched successfully', $movies));
+    }
 }
