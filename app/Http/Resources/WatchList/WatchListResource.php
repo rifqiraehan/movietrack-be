@@ -4,29 +4,11 @@ namespace App\Http\Resources\WatchList;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Movie\MovieResource;
+use App\Http\Resources\Status\StatusResource;
 
 class WatchListResource extends JsonResource
 {
-    //define properti
-    public $status;
-    public $message;
-    public $resource;
-
-    /**
-     * __construct
-     *
-     * @param  mixed $status
-     * @param  mixed $message
-     * @param  mixed $resource
-     * @return void
-     */
-    public function __construct($status, $message, $resource)
-    {
-        parent::__construct($resource);
-        $this->status = $status;
-        $this->message = $message;
-    }
-
     /**
      * Transform the resource into an array.
      *
@@ -35,9 +17,12 @@ class WatchListResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'success' => $this->status,
-            'message' => $this->message,
-            'data' => $this->resource
+            'id' => $this->id,
+            'user_id' => $this->user_id,
+            'movie_id' => $this->movie_id,
+            'status_id' => $this->status_id,
+            'movie' => new MovieResource(true, 'Movie details', $this->whenLoaded('movie')),
+            'status' => new StatusResource(true, 'Status details', $this->whenLoaded('status')),
         ];
     }
 }

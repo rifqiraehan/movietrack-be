@@ -10,7 +10,8 @@ use App\Models\Review;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 
-class MovieController extends Controller {
+class MovieController extends Controller
+{
     public function searchMovies(MovieSearchRequest $request)
     {
         $query = $request->input('query');
@@ -100,16 +101,16 @@ class MovieController extends Controller {
 
     // Get all movies for specific movie based movie_id. Endpoint: GET /movies/{movie_id}/reviews
     public function getMovieReviews($movie_id)
-{
-    $reviews = Review::where('movie_id', $movie_id)->latest()->get();
+    {
+        $reviews = Review::where('movie_id', $movie_id)->latest()->get();
 
-    if ($reviews->isEmpty()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'No reviews found for this movie',
-        ], 404);
+        if ($reviews->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No reviews found for this movie',
+            ], 404);
+        }
+
+        return response()->json(new ReviewResource(true, 'All reviews for movie', $reviews));
     }
-
-    return response()->json(new ReviewResource(true, 'All reviews for movie', $reviews));
-}
 }

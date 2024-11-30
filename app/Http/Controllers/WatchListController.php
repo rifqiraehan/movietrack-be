@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\WatchList\WatchListResource;
+use App\Http\Resources\WatchList\WatchListCollection;
 use App\Models\WatchList;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class WatchListController extends Controller
 {
@@ -12,29 +14,50 @@ class WatchListController extends Controller
     Watchlist have columns: id, user_id, movie_id, and status_id. I want to Get All Movies in Current User’s Watchlist. Endpoint: GET /watchlist
     */
 
-    public function index(Request $request)
+    public function get(Request $request)
     {
-        $user = auth()->user();
-        $token = $request->bearerToken();
+        $user = Auth::user();
 
-        if ($user && $user->token() && $user->token()->id === $token) {
-            $watchlist = WatchList::where('user_id', $user->id)->get();
-            return new WatchListResource(true, 'All movies in current user’s watchlist', $watchlist);
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return response()->json(['error' => 'Unauthorized'], 401);
+        $watchlist = WatchList::where('user_id', $user->id)->get();
+
+        if ($watchlist->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No movies in current user’s watchlist',
+            ], 404);
+        }
+
+        return (new WatchListCollection($watchlist))->additional([
+            'success' => true,
+            'message' => 'All movies in current user’s watchlist',
+        ]);
     }
 
-    /* public function index()
-    {
-        $watchlist = WatchList::where('user_id', auth()->id())->get();
-        return new WatchListResource(true, 'All movies in current user’s watchlist', $watchlist);
-    } */
-
     // Get Current User’s Watchlist by Status. Endpoint: GET /watchlist/{status_id}
-    public function show($status_id)
+    public function getBasedStatus($status_id)
     {
-        $watchlist = WatchList::where('user_id', auth()->id())->where('status_id', $status_id)->get();
-        return new WatchListResource(true, 'All movies in current user’s watchlist by status', $watchlist);
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $watchlist = WatchList::where('user_id', $user->id)->where('status_id', $status_id)->get();
+
+        if ($watchlist->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No movies in current user’s watchlist with this status',
+            ], 404);
+        }
+
+        return (new WatchListCollection($watchlist))->additional([
+            'success' => true,
+            'message' => 'All movies in current user’s watchlist with status',
+        ]);
     }
 }

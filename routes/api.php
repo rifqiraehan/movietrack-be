@@ -21,6 +21,26 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
     Route::patch('/users', [UserController::class, 'update']);
     Route::post('/users/logout', [UserController::class, 'logout']);
 
+    /*
+    |--------------------------------------------------------------------------
+    | Get All Movies in Current User’s Watchlist
+    |--------------------------------------------------------------------------
+    | URL: /watchlists
+    | Method: GET
+    | Description: Fetch all movies in the current user's watchlist
+    */
+    Route::get('/watchlists', [WatchListController::class, 'get']);
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Get Current User’s Watchlist by Status
+    |--------------------------------------------------------------------------
+    | URL: /watchlists/{status_id}
+    | Method: GET
+    | Description: Fetch all movies in the current user's watchlist by status
+    */
+    Route::get('/watchlists/{status_id}', [WatchListController::class, 'getBasedStatus']);
+
 });
 
 /*
@@ -62,23 +82,3 @@ Route::get('/movies/{movie_id}/reviews', [MovieController::class, 'getMovieRevie
 | Description: Fetch all reviews for all movies
 */
 Route::get('/reviews', [ReviewController::class, 'index']);
-
-/*
-|--------------------------------------------------------------------------
-| Get All Movies in Current User’s Watchlist
-|--------------------------------------------------------------------------
-| URL: /watchlists
-| Method: GET
-| Description: Fetch all movies in the current user's watchlist
-*/
-Route::get('/watchlists', [WatchListController::class, 'index']);
-
-/*
-|--------------------------------------------------------------------------
-| Get Current User’s Watchlist by Status
-|--------------------------------------------------------------------------
-| URL: /watchlists/{status_id}
-| Method: GET
-| Description: Fetch all movies in the current user's watchlist by status
-*/
-Route::get('/watchlists/{status_id}', [WatchListController::class, 'show']);
