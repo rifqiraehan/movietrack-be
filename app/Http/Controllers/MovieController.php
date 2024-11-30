@@ -40,9 +40,15 @@ class MovieController extends Controller {
             ];
         }, $tmdbMovies);
 
-        // Combine DB movies and TMDB movies
+        // Combine DB movies and TMDB movies, prioritizing DB movies
         $movies = $dbMovies->toArray();
-        $movies = array_merge($movies, $tmdbMovies);
+        $dbMovieIds = $dbMovies->pluck('id')->toArray();
+
+        foreach ($tmdbMovies as $tmdbMovie) {
+            if (!in_array($tmdbMovie['id'], $dbMovieIds)) {
+                $movies[] = $tmdbMovie;
+            }
+        }
 
         return response()->json(new MovieResource(true, 'Movies fetched successfully', $movies));
     }
