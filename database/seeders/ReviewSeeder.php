@@ -71,14 +71,14 @@ class ReviewSeeder extends Seeder
             $translatedOverview = $this->translatedOverview($tmdbMovie['overview']);
             $movie = Movie::create([
                 'id' => $tmdbMovie['id'],
-                'title' => $tmdbMovie['title'],
-                'poster_path' => $tmdbMovie['poster_path'],
-                'release_date' => $tmdbMovie['release_date'],
-                'overview' => $translatedOverview,
-                'score' => $tmdbMovie['vote_average'],
-                'production_name' => $tmdbMovie['production_companies'][0]['name'] ?? null,
-                'duration' => $tmdbMovie['runtime'],
-                'status' => $tmdbMovie['status'],
+                // 'title' => $tmdbMovie['title'],
+                // 'poster_path' => $tmdbMovie['poster_path'],
+                // 'release_date' => $tmdbMovie['release_date'],
+                // 'overview' => $translatedOverview,
+                // 'production_name' => $tmdbMovie['production_companies'][0]['name'] ?? null,
+                // 'duration' => $tmdbMovie['runtime'],
+                // 'status' => $tmdbMovie['status'],
+                // 'vote_average' => $tmdbMovie['vote_average'],
             ]);
         }
 

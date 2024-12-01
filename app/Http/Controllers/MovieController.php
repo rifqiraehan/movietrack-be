@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Movie\MovieSearchRequest;
 use App\Http\Resources\Movie\MovieResource;
+use App\Http\Resources\Review\ReviewCollection;
 use App\Http\Resources\Review\ReviewResource;
 use App\Models\Movie;
 use App\Models\Review;
@@ -89,7 +90,10 @@ class MovieController extends Controller
             'poster_path' => $tmdbMovie['poster_path'],
             'release_date' => $tmdbMovie['release_date'],
             'genres' => array_map(function ($genre) {
-                return $genre['name'];
+                return [
+                    'id' => $genre['id'],
+                    'name' => $genre['name']
+                ];
             }, $tmdbMovie['genres']),
             'overview' => $translatedOverview,
             'production_companies' => [
@@ -97,6 +101,7 @@ class MovieController extends Controller
             ],
             'runtime' => $tmdbMovie['runtime'],
             'status' => $tmdbMovie['status'],
+            'vote_average' => number_format($tmdbMovie['vote_average'], 1),
         ];
 
         return response()->json(new MovieResource(true, 'Detail Movie fetched in TDMB API successfully', $tmdbMovie));
@@ -114,7 +119,7 @@ class MovieController extends Controller
             ], 404);
         }
 
-        return response()->json(new ReviewResource(true, 'All reviews for movie', $reviews));
+        return new ReviewCollection($reviews);
     }
 
     private function translatedOverview(string $overview): string
