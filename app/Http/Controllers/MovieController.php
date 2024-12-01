@@ -58,6 +58,48 @@ class MovieController extends Controller
 
     public function getMovie($id)
     {
+        // Fetch movie from TMDB API
+        $client = new Client();
+        $response = $client->get("https://api.themoviedb.org/3/movie/{$id}", [
+            'query' => [
+                'api_key' => env('TMDB_API_KEY'),
+            ],
+        ]);
+
+        $tmdbMovie = json_decode($response->getBody()->getContents(), true);
+
+        if (isset($tmdbMovie['id'])) {
+            // Safely access the first production company name
+            $firstProductionCompanyName = isset($tmdbMovie['production_companies'][0])
+                ? $tmdbMovie['production_companies'][0]['name']
+                : null;
+
+            $translatedOverview = $this->translatedOverview($tmdbMovie['overview']);
+
+            // Filter and format TMDB movie
+            $tmdbMovie = [
+                'id' => $tmdbMovie['id'],
+                'title' => $tmdbMovie['title'],
+                'poster_path' => $tmdbMovie['poster_path'],
+                'release_date' => $tmdbMovie['release_date'],
+                'genres' => array_map(function ($genre) {
+                    return [
+                        'id' => $genre['id'],
+                        'name' => $genre['name']
+                    ];
+                }, $tmdbMovie['genres']),
+                'overview' => $translatedOverview,
+                'production_companies' => [
+                    'name' => $firstProductionCompanyName
+                ],
+                'runtime' => $tmdbMovie['runtime'],
+                'status' => $tmdbMovie['status'],
+                'vote_average' => number_format($tmdbMovie['vote_average'], 1),
+            ];
+
+            return response()->json(new MovieResource(true, 'Detail Movie fetched in TMDB API successfully', $tmdbMovie));
+        }
+
         // Fetch movie from the database
         $dbMovie = Movie::find($id);
 
@@ -65,46 +107,10 @@ class MovieController extends Controller
             return response()->json(new MovieResource(true, 'Movie fetched in DB successfully', $dbMovie));
         }
 
-        // Fetch movie from TMDB API
-        $client = new Client();
-        $response = $client->get("https://api.themoviedb.org/3/movie/{$id}", [
-            'query' => [
-                // 'language' => 'id-ID',
-                'api_key' => env('TMDB_API_KEY'),
-            ],
-        ]);
-
-        $tmdbMovie = json_decode($response->getBody()->getContents(), true);
-
-        // Safely access the first production company name
-        $firstProductionCompanyName = isset($tmdbMovie['production_companies'][0])
-            ? $tmdbMovie['production_companies'][0]['name']
-            : null;
-
-        $translatedOverview = $this->translatedOverview($tmdbMovie['overview']);
-
-        // Filter and format TMDB movie
-        $tmdbMovie = [
-            'id' => $tmdbMovie['id'],
-            'title' => $tmdbMovie['title'],
-            'poster_path' => $tmdbMovie['poster_path'],
-            'release_date' => $tmdbMovie['release_date'],
-            'genres' => array_map(function ($genre) {
-                return [
-                    'id' => $genre['id'],
-                    'name' => $genre['name']
-                ];
-            }, $tmdbMovie['genres']),
-            'overview' => $translatedOverview,
-            'production_companies' => [
-                'name' => $firstProductionCompanyName
-            ],
-            'runtime' => $tmdbMovie['runtime'],
-            'status' => $tmdbMovie['status'],
-            'vote_average' => number_format($tmdbMovie['vote_average'], 1),
-        ];
-
-        return response()->json(new MovieResource(true, 'Detail Movie fetched in TDMB API successfully', $tmdbMovie));
+        return response()->json([
+            'success' => false,
+            'message' => 'Movie not found',
+        ], 404);
     }
 
     // Get all movies for specific movie based movie_id. Endpoint: GET /movies/{movie_id}/reviews
