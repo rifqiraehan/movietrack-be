@@ -7,6 +7,7 @@ use App\Http\Resources\Movie\MovieResource;
 use App\Http\Resources\Review\ReviewResource;
 use App\Models\Movie;
 use App\Models\Review;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 
@@ -67,7 +68,7 @@ class MovieController extends Controller
         $client = new Client();
         $response = $client->get("https://api.themoviedb.org/3/movie/{$id}", [
             'query' => [
-                'language' => 'id-ID',
+                // 'language' => 'id-ID',
                 'api_key' => env('TMDB_API_KEY'),
             ],
         ]);
@@ -79,6 +80,8 @@ class MovieController extends Controller
             ? $tmdbMovie['production_companies'][0]['name']
             : null;
 
+        $translatedOverview = $this->translatedOverview($tmdbMovie['overview']);
+
         // Filter and format TMDB movie
         $tmdbMovie = [
             'id' => $tmdbMovie['id'],
@@ -88,7 +91,7 @@ class MovieController extends Controller
             'genres' => array_map(function ($genre) {
                 return $genre['name'];
             }, $tmdbMovie['genres']),
-            'overview' => $tmdbMovie['overview'],
+            'overview' => $translatedOverview,
             'production_companies' => [
                 'name' => $firstProductionCompanyName
             ],
@@ -96,7 +99,7 @@ class MovieController extends Controller
             'status' => $tmdbMovie['status'],
         ];
 
-        return response()->json(new MovieResource(true, 'Movie fetched in TDMB API successfully', $tmdbMovie));
+        return response()->json(new MovieResource(true, 'Detail Movie fetched in TDMB API successfully', $tmdbMovie));
     }
 
     // Get all movies for specific movie based movie_id. Endpoint: GET /movies/{movie_id}/reviews
@@ -112,6 +115,28 @@ class MovieController extends Controller
         }
 
         return response()->json(new ReviewResource(true, 'All reviews for movie', $reviews));
+    }
+
+    private function translatedOverview(string $overview): string
+    {
+        $deeplClient = new Client();
+        try {
+            $deeplResponse = $deeplClient->post('https://api-free.deepl.com/v2/translate', [
+                'headers' => [
+                    'Authorization' => 'DeepL-Auth-Key ' . env('DEEPL_API_KEY'),
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'text' => [$overview],
+                    'target_lang' => 'ID'
+                ],
+            ]);
+
+            $deeplTranslation = json_decode($deeplResponse->getBody()->getContents(), true);
+            return $deeplTranslation['translations'][0]['text'];
+        } catch (RequestException $e) {
+            return $overview;
+        }
     }
 
     /*

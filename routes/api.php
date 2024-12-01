@@ -103,3 +103,4 @@ Route::get('/recs', function () {
     ], 400);
 });
 Route::get('/movies/{movie_id}/recommendations', [MovieController::class, 'getMovieRecommendations']);
+
