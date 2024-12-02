@@ -70,6 +70,9 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
     // Get the recommended movies based on the current user watchlist
     Route::get('/recs/dynamic', [WatchListController::class, 'getRecs']);
 
+    // Get the count of the most genre in the current user watchlist
+    Route::get('/watchlist/most-genre', [WatchListController::class, 'getMostGenre']);
+
     // add to watchlist
     Route::post('/watchlists', [WatchListController::class, 'store']);
     Route::patch('/watchlists/id/', [WatchListController::class, 'update']);

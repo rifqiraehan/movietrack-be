@@ -348,8 +348,8 @@ class WatchListController extends Controller
             ], 404);
         }
 
-        // Get the genre with the highest count
-        $mostCommonGenre = collect($genres)->sortByDesc('count')->first();
+        // Get the genre with the highest count with smallest id
+        $mostCommonGenre = collect($genres)->sortByDesc('count')->sortBy('id')->first();
 
         $recommendations = $this->getMovieRecommendationsByGenre($mostCommonGenre['id']);
 
@@ -393,6 +393,69 @@ class WatchListController extends Controller
         }
 
         return response()->json(new MovieResource(true, 'Recommended movies fetched successfully', $movies));
+    }
+
+    // get count of most genre in watchlist current user
+    public function getMostGenre()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $watchlist = WatchList::where('user_id', $user->id)->get();
+
+        if ($watchlist->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No movies found in the user’s watchlist',
+            ], 404);
+        }
+
+        $movieIds = $watchlist->pluck('movie_id')->toArray();
+
+        $client = new Client();
+        $genres = [];
+        foreach ($movieIds as $movieId) {
+            $response = $client->get("https://api.themoviedb.org/3/movie/{$movieId}", [
+                'query' => [
+                    'api_key' => env('TMDB_API_KEY'),
+                ],
+            ]);
+
+            $tmdbMovie = json_decode($response->getBody()->getContents(), true);
+
+            if (isset($tmdbMovie['id'])) {
+                foreach ($tmdbMovie['genres'] as $genre) {
+                    if (!isset($genres[$genre['id']])) {
+                        $genres[$genre['id']] = [
+                            'id' => $genre['id'],
+                            'name' => $genre['name'],
+                            'count' => 1,
+                        ];
+                    } else {
+                        $genres[$genre['id']]['count']++;
+                    }
+                }
+            }
+        }
+
+        if (empty($genres)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No genres found in the user’s watchlist',
+            ], 404);
+        }
+
+        // Get the genre with the highest count with smallest id
+        $mostCommonGenre = collect($genres)->sortByDesc('count')->sortBy('id')->first();
+
+        return response()->json([
+            'data' => $mostCommonGenre,
+            'success' => true,
+            'message' => 'Most common genre in the user’s watchlist',
+        ]);
     }
 
     // delete watchlist:
