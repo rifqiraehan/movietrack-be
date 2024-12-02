@@ -112,7 +112,8 @@ Route::get('/movies/{id}', [MovieController::class, 'getMovie']);
 | Method: GET
 | Description: Fetch all reviews for a specific movie
 */
-Route::get('/movies/{movie_id}/reviews', [MovieController::class, 'getMovieReviews']);
+Route::get('/movies/{movie_id}/reviews', [ReviewController::class, 'getMovieReviews']);
+Route::get('/movies/{movie_id}/reviews/latest', [ReviewController::class, 'getLatestMovieReviews']);
 
 /*
 |--------------------------------------------------------------------------

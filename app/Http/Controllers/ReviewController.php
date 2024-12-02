@@ -43,6 +43,33 @@ class ReviewController extends Controller
         }
     }
 
+    // Get all movies for specific movie based movie_id. Endpoint: GET /movies/{movie_id}/reviews
+    public function getMovieReviews($movie_id)
+    {
+        $reviews = Review::where('movie_id', $movie_id)->latest()->get();
+
+        $reviews->each(function ($review) {
+            $review->recommendation_message = $this->getRecommendedMessage($review);
+        });
+
+        return new ReviewCollection($reviews);
+    }
+
+    // get movie reviews only latest
+    public function getLatestMovieReviews($movie_id)
+    {
+        $reviews = Review::where('movie_id', $movie_id)->latest()->limit(1)->get();
+
+        if ($reviews->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No reviews found for this movie',
+            ], 404);
+        }
+
+        return new ReviewCollection($reviews);
+    }
+
     // create review
     public function store(Request $request)
     {
@@ -57,7 +84,7 @@ class ReviewController extends Controller
             'movie_id' => 'required',
             'body' => 'nullable',
         ]);
-        
+
         $movieId = $request->movie_id;
 
         // Check if movie_id exists in the database

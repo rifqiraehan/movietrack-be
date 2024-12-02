@@ -115,21 +115,6 @@ class MovieController extends Controller
         ], 404);
     }
 
-    // Get all movies for specific movie based movie_id. Endpoint: GET /movies/{movie_id}/reviews
-    public function getMovieReviews($movie_id)
-    {
-        $reviews = Review::where('movie_id', $movie_id)->latest()->get();
-
-        if ($reviews->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No reviews found for this movie',
-            ], 404);
-        }
-
-        return new ReviewCollection($reviews);
-    }
-
     private function translatedOverview(string $overview): string
     {
         $deeplClient = new Client();
