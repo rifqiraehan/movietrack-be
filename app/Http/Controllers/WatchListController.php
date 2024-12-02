@@ -353,14 +353,7 @@ class WatchListController extends Controller
 
         $recommendations = $this->getMovieRecommendationsByGenre($mostCommonGenre['id']);
 
-        return response()->json([
-            'data' => [
-                'most_common_genre' => $mostCommonGenre,
-                'recommendations' => $recommendations->original,
-            ],
-            'success' => true,
-            'message' => 'Recommendations based on the most common genre in the user’s watchlist',
-        ]);
+        return response()->json($recommendations->original);
     }
 
     /*
