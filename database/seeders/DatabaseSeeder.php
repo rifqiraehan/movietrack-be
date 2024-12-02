@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Review;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\WatchList;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 
@@ -25,6 +27,7 @@ class DatabaseSeeder extends Seeder
         File::deleteDirectory(storage_path('app/public/pfps'));
 
         $this->call(UserSeeder::class);
+        $this->call(MovieSeeder::class);
         $this->call(GenreSeeder::class);
         $this->call(StatusSeeder::class);
         $this->call(ReviewSeeder::class);

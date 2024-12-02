@@ -70,6 +70,56 @@ class UserController extends Controller
         return (new UserResource($user))->response()->setStatusCode(200);
     }
 
+    // get all user registered except is_admin true
+    public function getAll(): JsonResponse
+    {
+        $users = User::where('is_admin', false)->get();
+
+        return response()->json([
+            'data' => UserResource::collection($users)
+        ])->setStatusCode(200);
+    }
+
+    // search user
+    public function search(Request $request): JsonResponse
+    {
+        $query = $request->query('query');
+
+        $users = User::where('email', 'like', '%' . $query . '%')
+            ->orWhere('username', 'like', '%' . $query . '%')
+            ->get();
+
+        return response()->json([
+            'data' => UserResource::collection($users)
+        ])->setStatusCode(200);
+    }
+
+    // reset choosed user password by 'secret'
+    public function resetPassword(Request $request, $id): JsonResponse
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            throw new HttpResponseException(response([
+                'errors' => [
+                    'message' => [
+                        'User not found'
+                    ]
+                ]
+            ], 404));
+        }
+
+        $user->password = Hash::make('acumalaka');
+        $user->save();
+
+        return response()->json([
+            'data' => [
+                'message' => 'Password reset successfully'
+            ]
+        ])->setStatusCode(200);
+    }
+
+    // get current user
     public function get(Request $request): UserResource
     {
         $user = Auth::user();

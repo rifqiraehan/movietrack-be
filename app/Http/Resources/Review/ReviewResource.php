@@ -20,8 +20,7 @@ class ReviewResource extends JsonResource
             'user_name' => $this->user->username,
             'movie_title' => $this->getMovieTitleFromTMDB($this->movie_id),
             'user_pfp' => $this->user->pfp,
-            // 'user' => new UserResource($this->whenLoaded('user')),
-            // 'movie' => new MovieResource(true, 'Movie details', $this->whenLoaded('movie')),
+            'recommendation_message' => $this->recommendation_message,
             'date' => $this->created_at->format('d M Y'),
         ];
     }

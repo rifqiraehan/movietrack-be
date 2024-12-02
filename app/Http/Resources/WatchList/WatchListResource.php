@@ -21,6 +21,7 @@ class WatchListResource extends JsonResource
             'user_id' => $this->user_id,
             'movie_id' => $this->movie_id,
             'status_id' => $this->status_id,
+            'score' => $this->score,
             'movie' => new MovieResource(true, 'Movie details', $this->whenLoaded('movie')),
             'status' => new StatusResource(true, 'Status details', $this->whenLoaded('status')),
         ];

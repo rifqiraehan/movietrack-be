@@ -16,6 +16,29 @@ use Illuminate\Support\Facades\Route;
 Route::post('/users/', [UserController::class, 'register']);
 Route::post('/users/login', [UserController::class, 'login']);
 
+// Get all users
+Route::get('/users/all', [UserController::class, 'getAll']);
+
+/*
+|--------------------------------------------------------------------------
+| Search for Users
+|--------------------------------------------------------------------------
+| URL: /users/search?query={search_query}
+| Method: GET
+| Description: Search for users by email or username
+*/
+Route::get('/users/search', [UserController::class, 'search']);
+
+/*
+|--------------------------------------------------------------------------
+| Reset Password the user
+|--------------------------------------------------------------------------
+| URL: /users/{user_id}/reset-password
+| Method: PATCH
+| Description: Reset the password of a user
+*/
+Route::patch('/users/{id}/reset-password', [UserController::class, 'resetPassword']);
+
 Route::middleware(ApiAuthMiddleware::class)->group(function () {
     Route::get('/users', [UserController::class, 'get']);
     Route::patch('/users', [UserController::class, 'update']);
@@ -41,6 +64,21 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
     */
     Route::get('/watchlists/{status_id}', [WatchListController::class, 'getBasedStatus']);
 
+    // Get the count of each genres in all movies in the current user watchlist
+    Route::get('/watchlist/genres', [WatchListController::class, 'getGenres']);
+
+    // Get the recommended movies based on the current user watchlist
+    Route::get('/recs/dynamic', [WatchListController::class, 'getRecs']);
+
+    // add to watchlist
+    Route::post('/watchlists', [WatchListController::class, 'store']);
+    Route::patch('/watchlists/id/', [WatchListController::class, 'update']);
+    Route::delete('/watchlists/id/', [WatchListController::class, 'destroy']);
+
+    Route::post('/reviews', [ReviewController::class, 'store']);
+    Route::patch('/movies/{movie_id}/reviews', [WatchListController::class, 'update']);
+    Route::delete('/movies/{movie_id}/reviews', [WatchListController::class, 'destroy']);
+
 });
 
 /*
@@ -52,6 +90,9 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
 | Description: Fetch all movies from the database and TMDB API
 */
 Route::get('/movies', [MovieController::class, 'searchMovies']);
+Route::post('/movies', [MovieController::class, 'createMovies']);
+Route::patch('/movies/{id}', [MovieController::class, 'updateMovies']);
+Route::delete('/movies/{id}', [MovieController::class, 'deleteMovies']);
 
 /*
 |--------------------------------------------------------------------------
@@ -88,7 +129,7 @@ Route::get('/reviews', [ReviewController::class, 'index']);
 |--------------------------------------------------------------------------
 | Get All Recommended Movies
 |--------------------------------------------------------------------------
-| URL: /movies/{type}
+| URL: /recs/{type}
 | Method: GET
 | Description: Fetch all recommended movies based on the type
 */

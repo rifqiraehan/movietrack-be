@@ -53,5 +53,21 @@ class UserSeeder extends Seeder
             'token' => 'cobacoba',
             'pfp' => 'akari.jpeg'
         ]);
+
+        User::create([
+            'username' => 'ghori',
+            'email' => 'ghori@gmail.com',
+            'password' => Hash::make('secret'),
+            'token' => 'cobacobainaja',
+            'pfp' => 'lain.jpeg'
+        ]);
+
+        User::create([
+            'username' => 'ghuraishi',
+            'email' => 'ghuraishi@gmail.com',
+            'password' => Hash::make('secret'),
+            'token' => 'cobacobainajakali',
+            'pfp' => 'akari.jpeg'
+        ]);
     }
 }

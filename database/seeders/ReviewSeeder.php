@@ -41,74 +41,21 @@ class ReviewSeeder extends Seeder
                 'user_id' => 5,
                 'movie_id' => 615165,
                 'body' => 'This movie was amazing! I loved it! I would definitely recommend it to anyone. 10/10! I want to watch it again!',
-            ]
+            ],
+            [
+                'user_id' => 5,
+                'movie_id' => 257475,
+                'body' => 'Wow, what a great movie! I don\'t know why I waited so long to watch it. I\'m definitely going to watch it again soon. But first, I need to watch the sequel. i watched this movie with my friends and we all loved it. I highly recommend it to everyone. It\'s a must-watch! I can\'t wait to watch it again. Yaay!',
+            ],
+            [
+                'user_id' => 2,
+                'movie_id' => 615165,
+                'body' => 'This movie is terrible.',
+            ],
         ];
 
         foreach ($reviews as $review) {
-            $this->createReviewWithMovie($review);
-        }
-    }
-
-    private function createReviewWithMovie(array $review)
-    {
-        $movieId = $review['movie_id'];
-
-        // Periksa apakah movie_id ada di database
-        $movie = Movie::find($movieId);
-
-        if (!$movie) {
-            // Jika tidak ada, ambil data dari API TMDB
-            $client = new Client();
-            $response = $client->get("https://api.themoviedb.org/3/movie/{$movieId}", [
-                'query' => [
-                    'api_key' => env('TMDB_API_KEY')
-                ],
-            ]);
-
-            $tmdbMovie = json_decode($response->getBody()->getContents(), true);
-
-            // Simpan data movie dari TMDB ke database
-            $translatedOverview = $this->translatedOverview($tmdbMovie['overview']);
-            $movie = Movie::create([
-                'id' => $tmdbMovie['id'],
-                // 'title' => $tmdbMovie['title'],
-                // 'poster_path' => $tmdbMovie['poster_path'],
-                // 'release_date' => $tmdbMovie['release_date'],
-                // 'overview' => $translatedOverview,
-                // 'production_name' => $tmdbMovie['production_companies'][0]['name'] ?? null,
-                // 'duration' => $tmdbMovie['runtime'],
-                // 'status' => $tmdbMovie['status'],
-                // 'vote_average' => $tmdbMovie['vote_average'],
-            ]);
-        }
-
-        // Buat review baru
-        Review::create([
-            'user_id' => $review['user_id'],
-            'movie_id' => $movie->id,
-            'body' => $review['body'],
-        ]);
-    }
-
-    private function translatedOverview(string $overview): string
-    {
-        $deeplClient = new Client();
-        try {
-            $deeplResponse = $deeplClient->post('https://api-free.deepl.com/v2/translate', [
-                'headers' => [
-                    'Authorization' => 'DeepL-Auth-Key ' . env('DEEPL_API_KEY'),
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'text' => [$overview],
-                    'target_lang' => 'ID'
-                ],
-            ]);
-
-            $deeplTranslation = json_decode($deeplResponse->getBody()->getContents(), true);
-            return $deeplTranslation['translations'][0]['text'];
-        } catch (RequestException $e) {
-            return $overview;
+            Review::create($review);
         }
     }
 }
