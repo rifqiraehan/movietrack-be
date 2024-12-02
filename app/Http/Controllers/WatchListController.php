@@ -63,21 +63,15 @@ class WatchListController extends Controller
 
         $watchlist = WatchList::where('user_id', $user->id)->where('status_id', $status_id)->get();
 
-        if ($watchlist->isEmpty()) {
+        /* if ($watchlist->isEmpty()) {
             return response()->json([
-                'success' => false,
-                'message' => 'No movies in current user’s watchlist with this status',
+            'success' => false,
+            'message' => 'No movies in current user’s watchlist with this status',
             ], 404);
-        }
-
-        $data = [
-            'status_id' => $status_id,
-            'count' => $watchlist->count(),
-            'movies' => $watchlist,
-        ];
+        } */
 
         return response()->json([
-            'data' => $data,
+            'data' => $watchlist,
             'success' => true,
             'message' => 'All movies in current user’s watchlist with status',
         ]);
@@ -174,56 +168,6 @@ class WatchListController extends Controller
             'success' => true,
             'message' => 'Movie updated in watchlist',
         ]);
-    }
-
-    public function getMovie($id)
-    {
-        // Fetch movie from TMDB API
-        $client = new Client();
-        $response = $client->get("https://api.themoviedb.org/3/movie/{$id}", [
-            'query' => [
-                'api_key' => env('TMDB_API_KEY'),
-            ],
-        ]);
-
-        $tmdbMovie = json_decode($response->getBody()->getContents(), true);
-
-        if (isset($tmdbMovie['id'])) {
-            // Filter and format TMDB movie
-            $tmdbMovie = [
-                'id' => $tmdbMovie['id'],
-                'title' => $tmdbMovie['title'],
-                'genres' => array_map(function ($genre) {
-                    return [
-                        'id' => $genre['id'],
-                        'name' => $genre['name']
-                    ];
-                }, $tmdbMovie['genres']),
-            ];
-
-            return response()->json(new MovieResource(true, 'Detail Movie fetched in TMDB API successfully', $tmdbMovie));
-        }
-
-        // Fetch movie from the database
-        $dbMovie = Movie::find($id);
-
-        if ($dbMovie) {
-            return response()->json(new MovieResource(true, 'Movie fetched in DB successfully', [
-                'id' => $dbMovie->id,
-                'title' => $dbMovie->title,
-                'genres' => $dbMovie->genres->map(function ($genre) {
-                    return [
-                        'id' => $genre->id,
-                        'name' => $genre->name
-                    ];
-                }),
-            ]));
-        }
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Movie not found',
-        ], 404);
     }
 
     /*
@@ -371,6 +315,7 @@ class WatchListController extends Controller
                 'page' => '1',
                 'sort_by' => 'popularity.desc',
                 'with_genres' => $genre_id,
+                'without_keyword' => 'homo, sex',
                 'api_key' => env('TMDB_API_KEY'),
             ],
         ]);
@@ -455,6 +400,40 @@ class WatchListController extends Controller
             'data' => $mostCommonGenre,
             'success' => true,
             'message' => 'Most common genre in the user’s watchlist',
+        ]);
+    }
+
+    // get count of watchlist of each status_id in current user
+    public function getStatusCount()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $statuses = [
+            1 => 'Watching',
+            2 => 'Completed',
+            3 => 'Dropped',
+            4 => 'Planned'
+        ];
+
+        $watchlist = WatchList::where('user_id', $user->id)->get();
+
+        $statusCount = [];
+        foreach ($statuses as $id => $name) {
+            $statusCount[] = [
+                'id' => $id,
+                'name' => $name,
+                'count' => $watchlist->where('status_id', $id)->count()
+            ];
+        }
+
+        return response()->json([
+            'data' => $statusCount,
+            'success' => true,
+            'message' => 'Count of watchlist of each status_id in the user’s watchlist',
         ]);
     }
 

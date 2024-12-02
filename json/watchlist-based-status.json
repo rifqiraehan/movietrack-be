@@ -1,0 +1,33 @@
+{
+    "comment-just-ignore" : "http://localhost:8000/api/watchlists/{status_id}  --AUTH",
+
+    "data": {
+        "status_id": "2",
+        "count": 1,
+        "movies": [
+            {
+                "id": 3,
+                "created_at": "2024-12-02T02:43:02.000000Z",
+                "updated_at": "2024-12-02T02:43:02.000000Z",
+                "user_id": 3,
+                "movie_id": 257475,
+                "status_id": 2,
+                "score": 8
+            }
+        ]
+    },
+    "success": true,
+    "message": "All movies in current user\u2019s watchlist with status",
+
+    "comment-response-ifEmpty-just-ignore" : [
+        {
+        "data": {
+            "status_id": "1",
+            "count": 0,
+            "movies": []
+        },
+        "success": true,
+        "message": "All movies in current user\u2019s watchlist with status"
+        }
+    ]
+}

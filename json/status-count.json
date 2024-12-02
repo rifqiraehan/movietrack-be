@@ -1,0 +1,27 @@
+{
+"comment" : "http://localhost:8000/api/watchlist/status-count  --AUTH",
+"data": [
+    {
+    "id": 1,
+    "name": "Watching",
+    "count": 0
+    },
+    {
+    "id": 2,
+    "name": "Completed",
+    "count": 1
+    },
+    {
+    "id": 3,
+    "name": "Dropped",
+    "count": 0
+    },
+    {
+    "id": 4,
+    "name": "Planned",
+    "count": 0
+    }
+],
+"success": true,
+"message": "Count of watchlist of each status_id in the user\u2019s watchlist"
+}

@@ -73,6 +73,9 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
     // Get the count of the most genre in the current user watchlist
     Route::get('/watchlist/most-genre', [WatchListController::class, 'getMostGenre']);
 
+    // Get the count of each status in the current user watchlist
+    Route::get('/watchlist/status-count', [WatchListController::class, 'getStatusCount']);
+
     // add to watchlist
     Route::post('/watchlists', [WatchListController::class, 'store']);
     Route::patch('/watchlists/id/', [WatchListController::class, 'update']);

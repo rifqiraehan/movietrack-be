@@ -1,0 +1,10 @@
+{
+    "comment" : "http://localhost:8000/api/watchlist/most-genre  --AUTH",
+    "data": {
+        "id": 16,
+        "name": "Animation",
+        "count": 1
+    },
+    "success": true,
+    "message": "Most common genre in the user’s watchlist"
+}
