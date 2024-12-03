@@ -251,11 +251,12 @@ class WatchListController extends Controller
         $watchlist = WatchList::where('user_id', $user->id)->get();
 
         if ($watchlist->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No movies found in the user’s watchlist',
-            ], 404);
-        }
+            // Use default genre ID 14 if watchlist is empty
+            $defaultGenreId = 14;
+            $recommendations = $this->getMovieRecommendationsByGenre($defaultGenreId);
+
+            return response()->json($recommendations->original);
+       }
 
         $movieIds = $watchlist->pluck('movie_id')->toArray();
 
