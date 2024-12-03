@@ -6,6 +6,7 @@ use App\Http\Resources\Review\ReviewCollection;
 use App\Http\Resources\Review\ReviewResource;
 use App\Models\Movie;
 use App\Models\Review;
+use App\Models\User;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,6 +71,37 @@ class ReviewController extends Controller
         return new ReviewCollection($reviews);
     }
 
+    // get review of movie_id by current user's watchlist
+    public function getReviewByUser($movie_id)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $review = Review::where('movie_id', $movie_id)->where('user_id', $user->id)->first();
+
+        /* if (!$review) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Review not found',
+            ], 404);
+        } */
+
+        // if the review is not created yet by user, return null
+        if (!$review) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Review not found',
+                'data' => 'type your review here',
+            ]);
+        }
+
+
+        return new ReviewResource($review);
+    }
+
     // create review
     public function store(Request $request)
     {
@@ -114,8 +146,8 @@ class ReviewController extends Controller
         }
 
         $review = Review::create([
-            'user_id' => auth()->id(),
-            'movie_id' => $request->movie_id,
+            'user_id' => $user->id,
+            'movie_id' => $movieId,
             'body' => $request->body,
         ]);
 

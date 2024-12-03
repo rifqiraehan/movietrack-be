@@ -24,7 +24,7 @@ return new class extends Migration
             $table->unsignedBigInteger('status_id');
             $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
 
-            $table->float('score', 0)->nullable();
+            $table->integer('score')->nullable();
         });
     }
 

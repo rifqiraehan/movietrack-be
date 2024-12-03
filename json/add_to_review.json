@@ -1,0 +1,14 @@
+{
+    "comment-request" : "http://localhost:8000/api/review?movie_id=1062807&body=Movienya bagus banget. Apalagi kalo ditonton bersama keluarga. Family Friendly.  --AUTH",
+    "data": {
+        "id": 8,
+        "user_id": 11,
+        "movie_id": "1062807",
+        "body": "Movienya bagus banget. Apalagi kalo ditonton bersama keluarga. Family Friendly.",
+        "user_name": "putri",
+        "movie_title": "SPY x FAMILY CODE: White",
+        "user_pfp": "http:\/\/localhost:8000\/storage\/pfps",
+        "recommendation_message": null,
+        "date": "03 Dec 2024"
+    }
+}

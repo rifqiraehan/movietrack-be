@@ -1,0 +1,14 @@
+{
+    "comment-request" : "/movies/{movie_id}/reviews/user  --AUTH",
+    "data": {
+        "id": 7,
+        "user_id": 2,
+        "movie_id": 615165,
+        "body": "This movie is terrible.",
+        "user_name": "AkebiKomichi",
+        "movie_title": "Her Blue Sky",
+        "user_pfp": "http://localhost:8000/storage/pfps/akebi.jpeg",
+        "recommendation_message": null,
+        "date": "03 Dec 2024"
+    }
+}

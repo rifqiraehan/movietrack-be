@@ -27,12 +27,12 @@ class WatchListController extends Controller
 
         $watchlist = WatchList::where('user_id', $user->id)->get();
 
-        if ($watchlist->isEmpty()) {
+        /* if ($watchlist->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'No movies in current user’s watchlist',
             ], 404);
-        }
+        } */
 
         $watchlistGrouped = $watchlist->groupBy('status_id');
 
