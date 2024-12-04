@@ -29,6 +29,7 @@ Route::get('/users/all', [UserController::class, 'getAll']);
 */
 Route::get('/users/search', [UserController::class, 'search']);
 
+Route::delete('/users/{id}', [UserController::class, 'destroy']);
 /*
 |--------------------------------------------------------------------------
 | Reset Password the user

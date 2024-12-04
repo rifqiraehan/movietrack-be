@@ -179,6 +179,31 @@ class UserController extends Controller
         return new UserResource($user);
     }
 
+    // Remove user from database
+    public function destroy($id): JsonResponse
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            throw new HttpResponseException(response([
+                'errors' => [
+                    'message' => [
+                        'User not found'
+                    ]
+                ]
+            ], 404));
+        }
+
+        $user->delete();
+
+        return response()->json([
+            'data' => [
+                'message' => 'User deleted successfully'
+            ]
+        ])->setStatusCode(200);
+    }
+
+
     public function logout(Request $request): JsonResponse
     {
         $user = Auth::user();
