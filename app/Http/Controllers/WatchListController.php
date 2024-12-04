@@ -10,6 +10,7 @@ use GuzzleHttp\Client;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class WatchListController extends Controller
 {
@@ -142,32 +143,35 @@ class WatchListController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
+        // get watchlist by id
         $watchlist = WatchList::where('user_id', $user->id)->where('id', $id)->first();
 
-        if (!$watchlist) {
+        // get status_id and score from request
+        $status_id = $request->status_id;
+        $score = $request->score;
+
+
+        /* if (!$watchlist) {
             return response()->json([
                 'success' => false,
                 'message' => 'Movie not found in current user’s watchlist',
             ], 404);
-        }
+        } */
 
-        $request->validate([
-            'movie_id' => 'required|integer',
-            'status_id' => 'required|integer',
-            'score' => 'nullable|integer',
-        ]);
-
-        $watchlist->update([
-            'movie_id' => $request->movie_id,
-            'status_id' => $request->status_id,
-            'score' => $request->status_id,
-        ]);
-
+        $data = $request->only(['status_id', 'score']);
+        $watchlist->update(array_filter($data, fn($value) => !is_null($value)));
+/*
         return response()->json([
             'data' => $watchlist,
             'success' => true,
             'message' => 'Movie updated in watchlist',
         ]);
+ */
+        // Route: Route::put('/watchlist/{id}', 'WatchListController@update'); // id is watchlist id
+        // postman: PUT /watchlist/1
+        // headers: Authorization: Bearer {token}
+        // body: movie_id: 1, status_id: 1, score: 5
+        return (new WatchListCollection(collect([$watchlist])))->response()->setStatusCode(200);
     }
 
     /*

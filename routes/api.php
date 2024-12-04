@@ -78,14 +78,14 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
 
     // add to watchlist
     Route::post('/watchlists', [WatchListController::class, 'store']);
-    Route::patch('/watchlists/id/', [WatchListController::class, 'update']);
-    Route::delete('/watchlists/id/', [WatchListController::class, 'destroy']);
+    Route::patch('/watchlists/{watchlist_id}', [WatchListController::class, 'update']);
+    Route::delete('/watchlists/{watchlist_id}', [WatchListController::class, 'destroy']);
 
     Route::get('/movies/{movie_id}/reviews/user', [ReviewController::class, 'getReviewByUser']);
-    
+
     Route::post('/review', [ReviewController::class, 'store']);
-    Route::patch('/movies/{movie_id}/reviews', [WatchListController::class, 'update']);
-    Route::delete('/movies/{movie_id}/reviews', [WatchListController::class, 'destroy']);
+    Route::patch('/reviews/{id}', [ReviewController::class, 'update']);
+    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 
 });
 

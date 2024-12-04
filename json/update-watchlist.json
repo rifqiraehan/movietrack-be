@@ -1,0 +1,12 @@
+{
+    "comment-request" : "http: //127.0.0.1:8000/api/watchlists/{watchlist_id}  --PATCH, AUTH",
+    "data": [
+        {
+            "id": 18,
+            "user_id": 3,
+            "movie_id": 129,
+            "status_id": 3,
+            "score": "10"
+        }
+    ]
+}

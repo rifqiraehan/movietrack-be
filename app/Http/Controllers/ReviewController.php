@@ -7,6 +7,7 @@ use App\Http\Resources\Review\ReviewResource;
 use App\Models\Movie;
 use App\Models\Review;
 use App\Models\User;
+use App\Models\WatchList;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -155,27 +156,80 @@ class ReviewController extends Controller
     }
 
     // update review
-    public function update(Request $request, Review $review)
+    public function update(Request $request, $id)
     {
+        $user = Auth::user();
+
+        if(!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // get review by id
+        $review = Review::where('user_id', $user->id)->where('id', $id)->first();
+
+        /* if (!$review) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Review not found',
+            ], 404);
+        } */
+
+        if (!$review) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Review not found',
+            ], 404);
+        }
+
         $request->validate([
-            'body' => 'required',
+            'body' => 'nullable|string',
         ]);
 
-        $review->update([
-            'body' => $request->body,
-        ]);
+        try {
+            $review->update($request->only(['body']));
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update review',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
 
         return new ReviewResource($review);
     }
 
-    // delete review
-    public function destroy(Review $review)
+    // delete review, like review edit need id first to update
+    public function destroy($id)
     {
-        $review->delete();
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $review = Review::where('user_id', $user->id)->where('id', $id)->first();
+
+        if (!$review) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Review not found',
+            ], 404);
+        }
+
+        try {
+            $review->delete();
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete review',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Review deleted successfully',
         ]);
     }
+
 }
